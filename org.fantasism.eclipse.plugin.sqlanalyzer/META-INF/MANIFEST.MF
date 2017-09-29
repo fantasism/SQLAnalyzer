@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SqlAnalyzer
+Bundle-SymbolicName: org.fantasism.eclipse.plugin.sqjanalyzer
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.fantasism.eclipse.plugin.sqlanalyzer.Activator
+Bundle-Vendor: FANTASISM
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.datatools.sqltools.parsers.sql;bundle-version="1.0.2",
+ org.eclipse.datatools.sqltools.parsers.sql.lexer;bundle-version="1.0.1",
+ org.eclipse.datatools.sqltools.parsers.sql.query;bundle-version="1.2.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
