@@ -13,7 +13,7 @@ import java.util.List;
  * </p>
  * @author Takahide Ohsuka, FANTASISM.
  */
-public class ValueExpr<T> {
+public class ValueExpr<T extends AbstractModel<?>> extends AbstractModel<T> {
 
     public enum ValueType {
         COLUMN,
@@ -25,9 +25,6 @@ public class ValueExpr<T> {
         NESTED_VALUE,
         NULL,
     }
-
-    /** 所有者 */
-    private T owner;
 
     /** 値タイプ */
     private ValueType valueType;
@@ -53,20 +50,8 @@ public class ValueExpr<T> {
     /** ネストした値 */
     private ValueExpr<T> nestedValue;
 
-    /**
-     * 所有者を取得します。
-     * @return 所有者
-     */
-    public T getOwner() {
-        return owner;
-    }
-
-    /**
-     * 所有者を設定します。
-     * @param owner 所有者
-     */
-    public void setOwner(T owner) {
-        this.owner = owner;
+    public ValueExpr(T owner) {
+        super(owner);
     }
 
     /**

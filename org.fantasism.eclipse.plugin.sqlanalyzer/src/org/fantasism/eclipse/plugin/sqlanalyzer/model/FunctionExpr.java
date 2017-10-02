@@ -13,10 +13,7 @@ import java.util.List;
  * </p>
  * @author Takahide Ohsuka, FANTASISM.
  */
-public class FunctionExpr<T> {
-
-    /** 所有者 */
-    private T owner;
+public class FunctionExpr<T extends AbstractModel<?>> extends AbstractModel<T> {
 
     /** ファンクション名 */
     private String functionName;
@@ -24,20 +21,8 @@ public class FunctionExpr<T> {
     /** ファンクション引数 */
     private List<ValueExpr<FunctionExpr<T>>> parameterList;
 
-    /**
-     * 所有者を取得します。
-     * @return 所有者
-     */
-    public T getOwner() {
-        return owner;
-    }
-
-    /**
-     * 所有者を設定します。
-     * @param owner 所有者
-     */
-    public void setOwner(T owner) {
-        this.owner = owner;
+    public FunctionExpr(T owner) {
+        super(owner);
     }
 
     /**

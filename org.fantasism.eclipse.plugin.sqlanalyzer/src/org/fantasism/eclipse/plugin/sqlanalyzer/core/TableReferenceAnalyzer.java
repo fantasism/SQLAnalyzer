@@ -11,6 +11,8 @@ import org.eclipse.datatools.modelbase.sql.query.TableJoined;
 import org.eclipse.datatools.modelbase.sql.query.TableNested;
 import org.eclipse.datatools.modelbase.sql.query.TableQueryLateral;
 import org.eclipse.datatools.modelbase.sql.query.TableReference;
+import org.eclipse.datatools.modelbase.sql.query.WithTableReference;
+import org.fantasism.eclipse.plugin.sqlanalyzer.model.AbstractModel;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.ConditionExpr;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.Table;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.Table.JoinType;
@@ -25,7 +27,7 @@ import org.fantasism.eclipse.plugin.sqlanalyzer.model.Table.TableType;
  */
 public class TableReferenceAnalyzer {
 
-    public <T> Table<T> analyze(T owner, TableReference table) {
+    public <T extends AbstractModel<?>> Table<T> analyze(T owner, TableReference table) {
 
         if (table instanceof TableExpression) {
             if (table instanceof TableFunction) {
@@ -36,6 +38,9 @@ public class TableReferenceAnalyzer {
 
             } else if (table instanceof TableInDatabase) {
                 return analyzeInDatabase(owner, (TableInDatabase) table);
+
+            } else if (table instanceof WithTableReference) {
+                return analyzeWithTableReference(owner, (WithTableReference) table);
 
             } else {
                 System.out.println(table);
@@ -55,21 +60,20 @@ public class TableReferenceAnalyzer {
 
     }
 
-    private <T> Table<T> analyzeFunction(T owner, TableFunction tableRef) {
+    private <T extends AbstractModel<?>> Table<T> analyzeFunction(T owner, TableFunction tableRef) {
         System.out.println(TableFunction.class + ":" + tableRef);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> Table<T> analyzeQueryLateral(T owner, TableQueryLateral tableRef) {
+    private <T extends AbstractModel<?>> Table<T> analyzeQueryLateral(T owner, TableQueryLateral tableRef) {
         System.out.println(TableQueryLateral.class + ":" + tableRef);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> Table<T> analyzeInDatabase(T owner, TableInDatabase tableRef) {
+    private <T extends AbstractModel<?>> Table<T> analyzeInDatabase(T owner, TableInDatabase tableRef) {
         System.out.println(TableInDatabase.class + ":" + tableRef);
 
-        Table<T> table = new Table<T>();
-        table.setOwner(owner);                                      // 所有者
+        Table<T> table = new Table<T>(owner);
         table.setTableType(TableType.TABLE);                        // テーブル種別
         table.setTableName(tableRef.getName());                     // テーブル名
         table.setAlias(tableRef.getTableCorrelation().getName());   // 別名
@@ -77,7 +81,18 @@ public class TableReferenceAnalyzer {
         return table;
     }
 
-    private <T> Table<T> analyzeJoined(T owner, TableJoined tableRef) {
+    private <T extends AbstractModel<?>> Table<T> analyzeWithTableReference(T owner, WithTableReference tableRef) {
+        System.out.println(WithTableReference.class + ":" + tableRef);
+
+        Table<T> table = new Table<T>(owner);
+        table.setTableType(TableType.TABLE);                        // テーブル種別
+        table.setTableName(tableRef.getName());                     // テーブル名
+        table.setAlias(tableRef.getTableCorrelation().getName());   // 別名
+
+        return table;
+    }
+
+    private <T extends AbstractModel<?>> Table<T> analyzeJoined(T owner, TableJoined tableRef) {
         System.out.println(TableJoined.class + ":" + tableRef);
 
         Table<T> leftTable = analyze(owner, tableRef.getTableRefLeft());
@@ -89,8 +104,7 @@ public class TableReferenceAnalyzer {
 
         tableRef.getJoinOperator();
 
-        ConditionExpr<Table<T>> rightCondition = new ConditionExpr<Table<T>>();
-        rightCondition.setOwner(rightTable);
+        ConditionExpr<Table<T>> rightCondition = new ConditionExpr<Table<T>>(rightTable);
         rightCondition.setConditionExprType(null); // TODO
 
         SqlAnalyzerManager.getInstance().getSearchConditionAnalyzer().analyze(rightCondition, tableRef.getJoinCondition());
@@ -102,7 +116,7 @@ public class TableReferenceAnalyzer {
         return leftTable;
     }
 
-    private <T> Table<T> analyzeNested(T owner, TableNested table) {
+    private <T extends AbstractModel<?>> Table<T> analyzeNested(T owner, TableNested table) {
         System.out.println(TableNested.class + ":" + table);
         throw new RuntimeException("サポートしてません。");
     }

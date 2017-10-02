@@ -11,7 +11,6 @@ import org.eclipse.datatools.modelbase.sql.query.SearchConditionCombined;
 import org.eclipse.datatools.modelbase.sql.query.SearchConditionNested;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.ConditionExpr;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.ConditionExpr.ConditionExprType;
-import org.fantasism.eclipse.plugin.sqlanalyzer.model.ConditionExpr.ConditionType;
 
 /**
  * TODO クラスの概要
@@ -135,8 +134,7 @@ public class SearchConditionAnalyzer {
 
         System.out.println(SearchConditionNested.class + ":[BEGIN]" + searchCond);
 
-        ConditionExpr<T> nested = new ConditionExpr<T>();
-        nested.setOwner(owner);
+        ConditionExpr<T> nested = new ConditionExpr<T>(owner);
         nested.setConditionExprType(ConditionExprType.NESTED);
 
         analyze(nested, searchCond.getNestedCondition());
@@ -150,8 +148,7 @@ public class SearchConditionAnalyzer {
 
         System.out.println(SearchConditionNested.class + ":[BEGIN]" + searchCond);
 
-        ConditionExpr<T> nested = new ConditionExpr<T>();
-        nested.setOwner(owner);
+        ConditionExpr<T> nested = new ConditionExpr<T>(owner);
         nested.setConditionExprType(ConditionExprType.NESTED);
 
         analyze(nested, searchCond.getNestedCondition());

@@ -23,6 +23,7 @@ import org.eclipse.datatools.modelbase.sql.query.SearchConditionCombined;
 import org.eclipse.datatools.modelbase.sql.query.SearchConditionNested;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.ConditionExpr;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.ConditionExpr.ConditionExprType;
+import org.fantasism.eclipse.plugin.sqlanalyzer.model.AbstractModel;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.ValueExpr;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.ValueExpr.ValueType;
@@ -36,7 +37,7 @@ import org.fantasism.eclipse.plugin.sqlanalyzer.model.ValueExpr.ValueType;
  */
 public class PredicateAnalyzer {
 
-    public <T> ConditionExpr<T> analyze(T owner, Predicate cond) {
+    public <T extends AbstractModel<?>> ConditionExpr<T> analyze(T owner, Predicate cond) {
 
         if (cond instanceof PredicateBasic) {
             return analyzeBasic(owner, (PredicateBasic) cond);
@@ -89,17 +90,16 @@ public class PredicateAnalyzer {
 
     }
 
-    private <T> ConditionExpr<T> analyzeBasic(T owner, PredicateBasic cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeBasic(T owner, PredicateBasic cond) {
         System.out.println(PredicateBasic.class + ":" + cond);
 
         ValueExpressionAnalyzer analyzer = SqlAnalyzerManager.getInstance().getValueExpressionAnalyzer();
 
-        ConditionExpr<T> condition = new ConditionExpr<T>();
+        ConditionExpr<T> condition = new ConditionExpr<T>(owner);
 
         ValueExpr<ConditionExpr<T>> left = analyzer.analyze(condition, cond.getLeftValueExpr());
         ValueExpr<ConditionExpr<T>> right = analyzer.analyze(condition, cond.getRightValueExpr());
 
-        condition.setOwner(owner);
         String operator = cond.getComparisonOperator().getName();
         if ("EQUAL".equals(operator)) {
             condition.setConditionExprType(ConditionExprType.EQUALS); // TODO 条件種別
@@ -112,18 +112,17 @@ public class PredicateAnalyzer {
         return condition;
     }
 
-    private <T> ConditionExpr<T> analyzeBetween(T owner, PredicateBetween cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeBetween(T owner, PredicateBetween cond) {
         System.out.println(PredicateBetween.class + ":" + cond);
 
         ValueExpressionAnalyzer analyzer = SqlAnalyzerManager.getInstance().getValueExpressionAnalyzer();
 
-        ConditionExpr<T> condition = new ConditionExpr<T>();
+        ConditionExpr<T> condition = new ConditionExpr<T>(owner);
 
         ValueExpr<ConditionExpr<T>> left = analyzer.analyze(condition, cond.getLeftValueExpr());
         ValueExpr<ConditionExpr<T>> rightFrom = analyzer.analyze(condition, cond.getRightValueExpr1());
         ValueExpr<ConditionExpr<T>> rightTo = analyzer.analyze(condition, cond.getRightValueExpr2());
 
-        condition.setOwner(owner);
         condition.setConditionExprType(ConditionExprType.BETWEEN);
         condition.setSrcValue(left);
         condition.setBetweenFrom(rightFrom);
@@ -132,17 +131,17 @@ public class PredicateAnalyzer {
         return condition;
     }
 
-    private <T> ConditionExpr<T> analyzeExists(T owner, PredicateExists cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeExists(T owner, PredicateExists cond) {
         System.out.println(PredicateExists.class + ":" + cond);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> ConditionExpr<T> analyzeInValueList(T owner, PredicateInValueList cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeInValueList(T owner, PredicateInValueList cond) {
         System.out.println(PredicateInValueList.class + ":" + cond);
 
         ValueExpressionAnalyzer valueExprAnalyzer = SqlAnalyzerManager.getInstance().getValueExpressionAnalyzer();
 
-        ConditionExpr<T> condition = new ConditionExpr<>();
+        ConditionExpr<T> condition = new ConditionExpr<T>(owner);
 
         ValueExpr<ConditionExpr<T>> srcValue = valueExprAnalyzer.analyze(condition, cond.getValueExpr());
 
@@ -158,7 +157,6 @@ public class PredicateAnalyzer {
             lastDestValue = tempDestValue;
         }
 
-        condition.setOwner(owner);
         if (cond.isNotIn()) {
             condition.setConditionExprType(ConditionExprType.NOT_IN);
         } else {
@@ -170,30 +168,28 @@ public class PredicateAnalyzer {
         return condition;
     }
 
-    private <T> ConditionExpr<T> analyzeInValueRowSelect(T owner, PredicateInValueRowSelect cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeInValueRowSelect(T owner, PredicateInValueRowSelect cond) {
         System.out.println(PredicateInValueRowSelect.class + ":" + cond);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> ConditionExpr<T> analyzeInValueSelect(T owner, PredicateInValueSelect cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeInValueSelect(T owner, PredicateInValueSelect cond) {
         System.out.println(PredicateInValueSelect.class + ":" + cond);
 
         ValueExpressionAnalyzer valueExprAnalyzer = SqlAnalyzerManager.getInstance().getValueExpressionAnalyzer();
         QueryExpressionAnalyzer queryExprAnalyzer = SqlAnalyzerManager.getInstance().getQueryExpressionAnalyzer();
 
-        ConditionExpr<T> condition = new ConditionExpr<>();
+        ConditionExpr<T> condition = new ConditionExpr<T>(owner);
 
         ValueExpr<ConditionExpr<T>> srcValue = valueExprAnalyzer.analyze(condition, cond.getValueExpr());
 
-        ValueExpr<ConditionExpr<T>> destValue = new ValueExpr<ConditionExpr<T>>();
+        ValueExpr<ConditionExpr<T>> destValue = new ValueExpr<ConditionExpr<T>>(condition);
 
         Query<ValueExpr<ConditionExpr<T>>> destQuery = queryExprAnalyzer.analyze(destValue, cond.getQueryExpr());
 
-        destValue.setOwner(condition);              // 所有者
         destValue.setValueType(ValueType.SUBQUERY); // 値種別
         destValue.setQuery(destQuery);              // クエリ
 
-        condition.setOwner(owner);
         if (cond.isNotIn()) {
             condition.setConditionExprType(ConditionExprType.NOT_IN);
         } else {
@@ -205,33 +201,33 @@ public class PredicateAnalyzer {
         return condition;
     }
 
-    private <T> ConditionExpr<T> analyzeIsNull(T owner, PredicateIsNull cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeIsNull(T owner, PredicateIsNull cond) {
         System.out.println(PredicateIsNull.class + ":" + cond);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> ConditionExpr<T> analyzeLike(T owner, PredicateLike cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeLike(T owner, PredicateLike cond) {
         System.out.println(PredicateLike.class + ":" + cond);
         throw new RuntimeException("サポートしてません。");
 
     }
 
-    private <T> ConditionExpr<T> analyzeQuantifiedRowSelect(T owner, PredicateQuantifiedRowSelect cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeQuantifiedRowSelect(T owner, PredicateQuantifiedRowSelect cond) {
         System.out.println(PredicateQuantifiedRowSelect.class + ":" + cond);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> ConditionExpr<T> analyzeQuantifiedValueSelect(T owner, PredicateQuantifiedValueSelect cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeQuantifiedValueSelect(T owner, PredicateQuantifiedValueSelect cond) {
         System.out.println(PredicateQuantifiedValueSelect.class + ":" + cond);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> ConditionExpr<T> analyzeIn(T owner, PredicateIn cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeIn(T owner, PredicateIn cond) {
         System.out.println(PredicateIn.class + ":" + cond);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> ConditionExpr<T> analyzeQuantified(T owner, PredicateQuantified cond) {
+    private <T extends AbstractModel<?>> ConditionExpr<T> analyzeQuantified(T owner, PredicateQuantified cond) {
         System.out.println(PredicateQuantified.class + ":" + cond);
         throw new RuntimeException("サポートしてません。");
     }

@@ -50,12 +50,15 @@ public class SqlAnalyzer {
         try {
             StringBuilder sb = new StringBuilder();
             sb
+            .append("WITH TEST as (    SELECT a.* FROM T_TEST)")
             .append("    SELECT a.* ")
             .append("         , b.NAME as NAME1 ")
             .append("         , 'aa' as NAME2 ")
             .append("      FROM TABLE1 a ")
             .append("INNER JOIN TABLE2 b ")
             .append("        ON a.ID = b.ID ")
+            .append("INNER JOIN TEST c ")
+            .append("        ON a.ID = c.ID ")
             .append("     WHERE a.GROUP    = 'bbb' ")
             .append("       AND a.CATEGORY = 'ccc' ")
             .append("       AND (   a.TYPE in ('01', '02') ")

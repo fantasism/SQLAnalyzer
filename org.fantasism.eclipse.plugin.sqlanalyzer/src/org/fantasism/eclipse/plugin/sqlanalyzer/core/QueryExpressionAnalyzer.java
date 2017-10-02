@@ -14,6 +14,7 @@ import org.eclipse.datatools.modelbase.sql.query.QueryNested;
 import org.eclipse.datatools.modelbase.sql.query.QuerySelect;
 import org.eclipse.datatools.modelbase.sql.query.QueryValues;
 import org.eclipse.emf.ecore.util.QueryDelegate;
+import org.fantasism.eclipse.plugin.sqlanalyzer.model.AbstractModel;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
 
 /**
@@ -25,7 +26,7 @@ import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
  */
 public class QueryExpressionAnalyzer {
 
-    public <T> Query<T> analyze(T owner, QueryExpression expr) {
+    public <T extends AbstractModel<?>> Query<T> analyze(T owner, QueryExpression expr) {
 
         if (expr instanceof QueryExpressionBody) {
             return analyzeBody(owner, (QueryExpressionBody) expr);
@@ -43,7 +44,7 @@ public class QueryExpressionAnalyzer {
 
     }
 
-    private <T> Query<T> analyzeBody(T owner, QueryExpressionBody expr) {
+    private <T extends AbstractModel<?>> Query<T> analyzeBody(T owner, QueryExpressionBody expr) {
         System.out.println(QueryExpressionBody.class + ":" + expr);
 
         QueryAnalyzer analyzer = SqlAnalyzerManager.getInstance().getQueryAnalyzer();
@@ -51,12 +52,12 @@ public class QueryExpressionAnalyzer {
         return analyzer.analyze(owner, expr);
     }
 
-    private <T> Query<T> analyzeDefault(T owner, QueryExpressionDefault expr) {
+    private <T extends AbstractModel<?>> Query<T> analyzeDefault(T owner, QueryExpressionDefault expr) {
         System.out.println(QueryExpressionDefault.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> Query<T> analyzeRoot(T owner, QueryExpressionRoot expr) {
+    private <T extends AbstractModel<?>> Query<T> analyzeRoot(T owner, QueryExpressionRoot expr) {
         System.out.println(QueryExpressionRoot.class + ":" + expr);
         return analyzeBody(owner, expr.getQuery());
     }

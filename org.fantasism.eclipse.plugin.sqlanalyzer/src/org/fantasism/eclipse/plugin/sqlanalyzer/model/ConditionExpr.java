@@ -14,7 +14,7 @@ import java.util.List;
  * </p>
  * @author Takahide Ohsuka, FANTASISM.
  */
-public class ConditionExpr<T> {
+public class ConditionExpr<T extends AbstractModel<?>> extends AbstractModel<T> {
 
     public enum ConditionExprType {
         ROOT,
@@ -33,19 +33,8 @@ public class ConditionExpr<T> {
         NOT_EXISTS,
     }
 
-    public enum ConditionType {
-        AND,
-        OR,
-    }
-
-    /** 所有者 */
-    private T owner;
-
     /** 条件式タイプ */
     private ConditionExprType conditionExprType;
-
-    /** 条件タイプ */
-    private ConditionType conditionType;
 
     /** 右辺値 */
     private ValueExpr<ConditionExpr<T>> srcValue;
@@ -65,25 +54,10 @@ public class ConditionExpr<T> {
     /** ＯＲ条件式リスト */
     private List<ConditionExpr<?>> orConditionList;
 
-    public ConditionExpr() {
+    public ConditionExpr(T owner) {
+        super(owner);
         this.orConditionList = new ArrayList<ConditionExpr<?>>();
         this.andConditionList = new ArrayList<ConditionExpr<?>>();
-    }
-
-    /**
-     * 所有者を取得します。
-     * @return 所有者
-     */
-    public T getOwner() {
-        return owner;
-    }
-
-    /**
-     * 所有者を設定します。
-     * @param owner 所有者
-     */
-    public void setOwner(T owner) {
-        this.owner = owner;
     }
 
     /**
@@ -100,22 +74,6 @@ public class ConditionExpr<T> {
      */
     public void setConditionExprType(ConditionExprType conditionExprType) {
         this.conditionExprType = conditionExprType;
-    }
-
-    /**
-     * 条件タイプを取得します。
-     * @return 条件タイプ
-     */
-    public ConditionType getConditionType() {
-        return conditionType;
-    }
-
-    /**
-     * 条件タイプを設定します。
-     * @param conditionType 条件タイプ
-     */
-    public void setConditionType(ConditionType conditionType) {
-        this.conditionType = conditionType;
     }
 
     /**

@@ -4,6 +4,8 @@
 
 package org.fantasism.eclipse.plugin.sqlanalyzer.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +16,7 @@ import java.util.Map;
  * </p>
  * @author Takahide Ohsuka, FANTASISM.
  */
-public class Query<T> {
+public class Query<T extends AbstractModel<?>> extends AbstractModel<T> {
 
     public enum QueryType {
         SIMPLE_TABLE,
@@ -26,10 +28,7 @@ public class Query<T> {
     }
 
     /** サブクエリリスト */
-    public List<Query<?>> subQueryList;
-
-    /** 所有者 */
-    private T owner;
+    private List<Query<?>> subQueryList;
 
     /** クエリ種別 */
     private QueryType queryType;
@@ -66,20 +65,31 @@ public class Query<T> {
     /** 関連クエリ */
     private Map<String, Query<Query<?>>> relationQueryMap;
 
-    /**
-     * 所有者を取得します。
-     * @return 所有者
-     */
-    public T getOwner() {
-        return owner;
+    public Query(T owner) {
+        super(owner);
+        this.subQueryList = new ArrayList<Query<?>>();
+        this.selectClausesList = new ArrayList<SelectClause<Query<T>>>();
+        this.fromClauseList = new ArrayList<FromClause<Query<T>>>();
+        this.groupByClauseList = new ArrayList<GroupByClause<Query<T>>>();
+        this.orderByClauseList = new ArrayList<OrderByClause<Query<T>>>();
+        this.setClauseList = new ArrayList<SetClause<Query<T>>>();
+        this.relationQueryMap = new HashMap<String, Query<Query<?>>>();
     }
 
     /**
-     * 所有者を設定します。
-     * @param owner 所有者
+     * サブクエリリストを取得します。
+     * @return サブクエリリスト
      */
-    public void setOwner(T owner) {
-        this.owner = owner;
+    public List<Query<?>> getSubQueryList() {
+        return subQueryList;
+    }
+
+    /**
+     * サブクエリリストを設定します。
+     * @param subQueryList サブクエリリスト
+     */
+    public void setSubQueryList(List<Query<?>> subQueryList) {
+        this.subQueryList = subQueryList;
     }
 
     /**

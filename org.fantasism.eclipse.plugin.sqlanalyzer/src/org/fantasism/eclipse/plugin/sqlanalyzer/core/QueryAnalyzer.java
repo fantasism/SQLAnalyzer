@@ -15,6 +15,7 @@ import org.eclipse.datatools.modelbase.sql.query.QueryResultSpecification;
 import org.eclipse.datatools.modelbase.sql.query.QuerySelect;
 import org.eclipse.datatools.modelbase.sql.query.QueryValues;
 import org.eclipse.datatools.modelbase.sql.query.TableReference;
+import org.fantasism.eclipse.plugin.sqlanalyzer.model.AbstractModel;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.Column;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.ConditionExpr;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.FromClause;
@@ -38,7 +39,7 @@ import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query.QueryType;
  */
 public class QueryAnalyzer {
 
-    public <T> Query<T> analyze(T owner, QueryExpressionBody query) {
+    public <T extends AbstractModel<?>> Query<T> analyze(T owner, QueryExpressionBody query) {
 
         if (query instanceof QuerySelect) {
             return analyzeSelect(owner, (QuerySelect) query);
@@ -58,11 +59,21 @@ public class QueryAnalyzer {
         }
     }
 
-    private <T> Query<T> analyzeSelect(T owner, QuerySelect select) {
+    private <T extends AbstractModel<?>> Query<T> analyzeSelect(T owner, QuerySelect select) {
 
-        Query<T> query = new Query<T>();
+        Query<T> query = new Query<T>(owner);
 
-        query.setOwner(owner);
+        if (owner != null) {
+            if (owner.getOwnerQuery() != null) {
+                owner.getOwnerQuery().getSubQueryList().add(query);
+            } else {
+                // 処理なし
+            }
+        } else {
+            query.setOwner(query);
+            query.setOwnerQuery(query);
+        }
+
         query.setQueryType(QueryType.QUERY_SELECT);
         query.setSelectClausesList(analyzeSelectClause(query, select));
         query.setFromClauseList(analyzeFromClause(query, select));
@@ -73,17 +84,17 @@ public class QueryAnalyzer {
         return query;
     }
 
-    private <T> Query<T> analyzeCombined(T owner, QueryCombined query) {
+    private <T extends AbstractModel<?>> Query<T> analyzeCombined(T owner, QueryCombined query) {
         System.out.println(QueryCombined.class + ":" + query);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> Query<T> analyzeValues(T owner, QueryValues query) {
+    private <T extends AbstractModel<?>> Query<T> analyzeValues(T owner, QueryValues query) {
         System.out.println(QueryValues.class + ":" + query);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> Query<T> analyzeNested(T owner, QueryNested query) {
+    private <T extends AbstractModel<?>> Query<T> analyzeNested(T owner, QueryNested query) {
         System.out.println(QueryNested.class + ":" + query);
         throw new RuntimeException("サポートしてません。");
     }
@@ -96,11 +107,10 @@ public class QueryAnalyzer {
         List<SelectClause<T>> selectClauseList = new ArrayList<>();
 
         for (Object item : query.getSelectClause()) {
-            SelectClause<T> selectClause = new SelectClause<T>();
+            SelectClause<T> selectClause = new SelectClause<T>(owner);
 
             SelectColumn<SelectClause<T>> column = analyzer.analyze(selectClause, (QueryResultSpecification) item);
 
-            selectClause.setOwner(owner);
             selectClause.setColumn(column);
 
             selectClauseList.add(selectClause);
@@ -116,11 +126,10 @@ public class QueryAnalyzer {
         List<FromClause<T>> fromClauseList = new ArrayList<FromClause<T>>();
 
         for (Object item : query.getFromClause()) {
-            FromClause<T> fromClause = new FromClause<T>();
+            FromClause<T> fromClause = new FromClause<T>(owner);
 
             Table<FromClause<T>> table = tableAnalyzer.analyze(fromClause, (TableReference) item);
 
-            fromClause.setOwner(owner);
             fromClause.setTable(table);
 
             fromClauseList.add(fromClause);
@@ -133,17 +142,12 @@ public class QueryAnalyzer {
 
         SearchConditionAnalyzer analyzer = SqlAnalyzerManager.getInstance().getSearchConditionAnalyzer();
 
-        WhereClause<T> whereClause = new WhereClause<T>();
+        WhereClause<T> whereClause = new WhereClause<T>(owner);
 
-        ConditionExpr<WhereClause<T>> condition = new ConditionExpr<WhereClause<T>>();
-        condition.setOwner(whereClause);
+        ConditionExpr<WhereClause<T>> condition = new ConditionExpr<WhereClause<T>>(whereClause);
         condition.setConditionExprType(null); // TODO
 
         analyzer.analyze(condition, query.getWhereClause());
-
-
-        whereClause.setOwner(owner);
-        whereClause.setWhereCondition(condition);
 
         return whereClause;
     }
@@ -168,15 +172,13 @@ public class QueryAnalyzer {
         if (query.getHavingClause() != null) {
             SearchConditionAnalyzer analyzer = SqlAnalyzerManager.getInstance().getSearchConditionAnalyzer();
 
-            havingClause = new HavingClause<T>();
+            havingClause = new HavingClause<T>(owner);
 
-            ConditionExpr<HavingClause<T>> condition = new ConditionExpr<HavingClause<T>>();
-            condition.setOwner(havingClause);
+            ConditionExpr<HavingClause<T>> condition = new ConditionExpr<HavingClause<T>>(havingClause);
             condition.setConditionExprType(null);
 
-             analyzer.analyze(condition, query.getHavingClause());
+            analyzer.analyze(condition, query.getHavingClause());
 
-            havingClause.setOwner(owner);
             havingClause.setHavingCondition(condition);
 
         } else {

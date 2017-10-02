@@ -9,6 +9,7 @@ import org.eclipse.datatools.modelbase.sql.query.QueryInsertStatement;
 import org.eclipse.datatools.modelbase.sql.query.QuerySelectStatement;
 import org.eclipse.datatools.modelbase.sql.query.QueryStatement;
 import org.eclipse.datatools.modelbase.sql.query.QueryUpdateStatement;
+import org.fantasism.eclipse.plugin.sqlanalyzer.model.AbstractModel;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
 
 /**
@@ -20,7 +21,7 @@ import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
  */
 public class QueryStatementAnalyzer {
 
-    public <T> Query<T> analyze(T owner, QueryStatement statement) {
+    public <T extends AbstractModel<?>> Query<T> analyze(T owner, QueryStatement statement) {
 
         if (statement instanceof QuerySelectStatement) {
             return analyzeSelectStatement(owner, (QuerySelectStatement)statement);
@@ -42,7 +43,7 @@ public class QueryStatementAnalyzer {
     }
 
 
-    private <T> Query<T> analyzeSelectStatement(T owner, QuerySelectStatement statement) {
+    private <T extends AbstractModel<?>> Query<T> analyzeSelectStatement(T owner, QuerySelectStatement statement) {
         System.out.println(QuerySelectStatement.class + ":" + statement);
 
         QueryExpressionAnalyzer analyzer = SqlAnalyzerManager.getInstance().getQueryExpressionAnalyzer();
@@ -52,17 +53,17 @@ public class QueryStatementAnalyzer {
         return query;
     }
 
-    private <T> Query<T> analyzeInsertStatement(T owner, QueryInsertStatement statement) {
+    private <T extends AbstractModel<?>> Query<T> analyzeInsertStatement(T owner, QueryInsertStatement statement) {
         System.out.println(QueryInsertStatement.class + ":" + statement);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> Query<T> analyzeUpdateStatement(T owner, QueryUpdateStatement statement) {
+    private <T extends AbstractModel<?>> Query<T> analyzeUpdateStatement(T owner, QueryUpdateStatement statement) {
         System.out.println(QueryUpdateStatement.class + ":" + statement);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T> Query<T> analyzeDeleteStatement(T owner, QueryDeleteStatement statement) {
+    private <T extends AbstractModel<?>> Query<T> analyzeDeleteStatement(T owner, QueryDeleteStatement statement) {
         System.out.println(QueryDeleteStatement.class + ":" + statement);
         throw new RuntimeException("サポートしてません。");
     }

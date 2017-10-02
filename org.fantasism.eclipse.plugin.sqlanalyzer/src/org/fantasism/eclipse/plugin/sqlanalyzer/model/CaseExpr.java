@@ -13,10 +13,7 @@ import java.util.List;
  * </p>
  * @author Takahide Ohsuka, FANTASISM.
  */
-public class CaseExpr<T> {
-
-    /** 所有者 */
-    private T owner;
+public class CaseExpr<T extends AbstractModel<?>> extends AbstractModel<T> {
 
     /** ケース */
     private List<CaseWhenThen<CaseExpr<T>>> caseWhenThenList;
@@ -24,20 +21,8 @@ public class CaseExpr<T> {
     /** その他の値 */
     private ValueExpr<CaseExpr<T>> elseValue;
 
-    /**
-     * 所有者を取得します。
-     * @return 所有者
-     */
-    public T getOwner() {
-        return owner;
-    }
-
-    /**
-     * 所有者を設定します。
-     * @param owner 所有者
-     */
-    public void setOwner(T owner) {
-        this.owner = owner;
+    public CaseExpr(T owner) {
+        super(owner);
     }
 
     /**
@@ -72,9 +57,8 @@ public class CaseExpr<T> {
         this.elseValue = elseValue;
     }
 
-    public static <T> ValueExpr<CaseExpr<T>> createValueExpr(CaseExpr<T> caseExpr) {
-        ValueExpr<CaseExpr<T>> valueExpr = new ValueExpr<CaseExpr<T>>();
-        valueExpr.setOwner(caseExpr);
+    public static <T extends AbstractModel<?>> ValueExpr<CaseExpr<T>> createValueExpr(CaseExpr<T> caseExpr) {
+        ValueExpr<CaseExpr<T>> valueExpr = new ValueExpr<CaseExpr<T>>(caseExpr);
         return valueExpr;
     }
 
