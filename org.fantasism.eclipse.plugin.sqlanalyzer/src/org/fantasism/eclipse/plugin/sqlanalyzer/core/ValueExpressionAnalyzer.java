@@ -25,11 +25,7 @@ import org.eclipse.datatools.modelbase.sql.query.ValueExpressionRow;
 import org.eclipse.datatools.modelbase.sql.query.ValueExpressionScalarSelect;
 import org.eclipse.datatools.modelbase.sql.query.ValueExpressionSimple;
 import org.eclipse.datatools.modelbase.sql.query.ValueExpressionVariable;
-import org.fantasism.eclipse.plugin.sqlanalyzer.model.AbstractModel;
-import org.fantasism.eclipse.plugin.sqlanalyzer.model.Column;
-import org.fantasism.eclipse.plugin.sqlanalyzer.model.Table;
-import org.fantasism.eclipse.plugin.sqlanalyzer.model.ValueExpr;
-import org.fantasism.eclipse.plugin.sqlanalyzer.model.ValueExpr.ValueType;
+import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
 
 /**
  * TODO クラスの概要
@@ -40,67 +36,67 @@ import org.fantasism.eclipse.plugin.sqlanalyzer.model.ValueExpr.ValueType;
  */
 public class ValueExpressionAnalyzer {
 
-    public <T extends AbstractModel<?>> ValueExpr<T> analyze(T owner, ValueExpression expr) {
+    public <T extends Query> void analyze(T owner, ValueExpression expr) {
 
         if (expr instanceof ValueExpressionCaseElse) {
-            return analyzeCaseElse(owner, (ValueExpressionCaseElse) expr);
+            analyzeCaseElse(owner, (ValueExpressionCaseElse) expr);
 
         } else if (expr instanceof ValueExpressionCaseSearch) {
-            return analyzeCaseSearch(owner, (ValueExpressionCaseSearch) expr);
+            analyzeCaseSearch(owner, (ValueExpressionCaseSearch) expr);
 
         } else if (expr instanceof ValueExpressionCaseSearchContent) {
-            return analyzeCaseSearchContent(owner, (ValueExpressionCaseSearchContent) expr);
+            analyzeCaseSearchContent(owner, (ValueExpressionCaseSearchContent) expr);
 
         } else if (expr instanceof ValueExpressionCaseSimple) {
-            return analyzeCaseSimple(owner, (ValueExpressionCaseSimple) expr);
+            analyzeCaseSimple(owner, (ValueExpressionCaseSimple) expr);
 
         } else if (expr instanceof ValueExpressionCaseSimpleContent) {
-            return analyzeCaseSimpleContent(owner, (ValueExpressionCaseSimpleContent) expr);
+            analyzeCaseSimpleContent(owner, (ValueExpressionCaseSimpleContent) expr);
 
         } else if (expr instanceof ValueExpressionCast) {
-            return analyzeCast(owner, (ValueExpressionCast) expr);
+            analyzeCast(owner, (ValueExpressionCast) expr);
 
         } else if (expr instanceof ValueExpressionColumn) {
-            return analyzeColumn(owner, (ValueExpressionColumn) expr);
+            analyzeColumn(owner, (ValueExpressionColumn) expr);
 
         } else if (expr instanceof ValueExpressionCombined) {
-            return analyzeCombined(owner, (ValueExpressionCombined) expr);
+            analyzeCombined(owner, (ValueExpressionCombined) expr);
 
         } else if (expr instanceof ValueExpressionDefault) {
-            return analyzeDefault(owner, (ValueExpressionDefault) expr);
+            analyzeDefault(owner, (ValueExpressionDefault) expr);
 
         } else if (expr instanceof ValueExpressionDefaultValue) {
-            return analyzeDefaultValue(owner, (ValueExpressionDefaultValue) expr);
+            analyzeDefaultValue(owner, (ValueExpressionDefaultValue) expr);
 
         } else if (expr instanceof ValueExpressionFunction) {
-            return analyzeFunction(owner, (ValueExpressionFunction) expr);
+            analyzeFunction(owner, (ValueExpressionFunction) expr);
 
         } else if (expr instanceof ValueExpressionLabeledDuration) {
-            return analyzeLabeledDuration(owner, (ValueExpressionLabeledDuration) expr);
+            analyzeLabeledDuration(owner, (ValueExpressionLabeledDuration) expr);
 
         } else if (expr instanceof ValueExpressionNested) {
-            return analyzeNested(owner, (ValueExpressionNested) expr);
+            analyzeNested(owner, (ValueExpressionNested) expr);
 
         } else if (expr instanceof ValueExpressionNullValue) {
-            return analyzeNullValue(owner, (ValueExpressionNullValue) expr);
+            analyzeNullValue(owner, (ValueExpressionNullValue) expr);
 
         } else if (expr instanceof ValueExpressionRow) {
-            return analyzeRow(owner, (ValueExpressionRow) expr);
+            analyzeRow(owner, (ValueExpressionRow) expr);
 
         } else if (expr instanceof ValueExpressionScalarSelect) {
-            return analyzeScalarSelect(owner, (ValueExpressionScalarSelect) expr);
+            analyzeScalarSelect(owner, (ValueExpressionScalarSelect) expr);
 
         } else if (expr instanceof ValueExpressionSimple) {
-            return analyzeSimple(owner, (ValueExpressionSimple) expr);
+            analyzeSimple(owner, (ValueExpressionSimple) expr);
 
         } else if (expr instanceof ValueExpressionVariable) {
-            return analyzeVariable(owner, (ValueExpressionVariable) expr);
+            analyzeVariable(owner, (ValueExpressionVariable) expr);
 
         } else if (expr instanceof ValueExpressionCase) {
-            return analyzeCase(owner, (ValueExpressionCase) expr);
+            analyzeCase(owner, (ValueExpressionCase) expr);
 
         } else if (expr instanceof ValueExpressionAtomic) {
-            return analyzeAtomic(owner, (ValueExpressionAtomic) expr);
+            analyzeAtomic(owner, (ValueExpressionAtomic) expr);
 
         } else {
             System.out.println(expr);
@@ -109,125 +105,99 @@ public class ValueExpressionAnalyzer {
 
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeAtomic(T owner, ValueExpressionAtomic expr) {
+    private <T extends Query> void analyzeAtomic(T owner, ValueExpressionAtomic expr) {
         System.out.println(ValueExpressionAtomic.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeCase(T owner, ValueExpressionCase expr) {
+    private <T extends Query> void analyzeCase(T owner, ValueExpressionCase expr) {
         System.out.println(ValueExpressionCase.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeCaseElse(T owner, ValueExpressionCaseElse expr) {
+    private <T extends Query> void analyzeCaseElse(T owner, ValueExpressionCaseElse expr) {
         System.out.println(ValueExpressionCaseElse.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
+        analyze(owner, expr.getValueExpr());
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeCaseSearch(T owner, ValueExpressionCaseSearch expr) {
+    private <T extends Query> void analyzeCaseSearch(T owner, ValueExpressionCaseSearch expr) {
         System.out.println(ValueExpressionCaseSearch.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeCaseSearchContent(T owner, ValueExpressionCaseSearchContent expr) {
+    private <T extends Query> void analyzeCaseSearchContent(T owner, ValueExpressionCaseSearchContent expr) {
         System.out.println(ValueExpressionCaseSearchContent.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeCaseSimple(T owner, ValueExpressionCaseSimple expr) {
+    private <T extends Query> void analyzeCaseSimple(T owner, ValueExpressionCaseSimple expr) {
         System.out.println(ValueExpressionCaseSimple.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeCaseSimpleContent(T owner, ValueExpressionCaseSimpleContent expr) {
+    private <T extends Query> void analyzeCaseSimpleContent(T owner, ValueExpressionCaseSimpleContent expr) {
         System.out.println(ValueExpressionCaseSimpleContent.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeCast(T owner, ValueExpressionCast expr) {
+    private <T extends Query> void analyzeCast(T owner, ValueExpressionCast expr) {
         System.out.println(ValueExpressionCast.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
+        analyze(owner, expr.getValueExprCast());
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeColumn(T owner, ValueExpressionColumn expr) {
+    private <T extends Query> void analyzeColumn(T owner, ValueExpressionColumn expr) {
         System.out.println(ValueExpressionColumn.class + ":" + expr);
-
-        TableReferenceAnalyzer tableAnalyzer = SqlAnalyzerManager.getInstance().getTableExpressionAnalyzer();
-
-        ValueExpr<T> valueExpr = new ValueExpr<T>(owner);
-
-        Table<ValueExpr<T>> table = tableAnalyzer.analyze(valueExpr, expr.getTableExpr());
-
-        Column<ValueExpr<T>> column = new Column<ValueExpr<T>>(valueExpr);
-        column.setTable(table);
-        column.setColumnName(expr.getName());
-
-        valueExpr.setValueType(ValueType.COLUMN);
-        valueExpr.setColumn(column);
-
-        return valueExpr;
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeCombined(T owner, ValueExpressionCombined expr) {
+    private <T extends Query> void analyzeCombined(T owner, ValueExpressionCombined expr) {
         System.out.println(ValueExpressionCombined.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
+        analyze(owner, expr.getLeftValueExpr());
+        analyze(owner, expr.getRightValueExpr());
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeDefault(T owner, ValueExpressionDefault expr) {
+    private <T extends Query> void analyzeDefault(T owner, ValueExpressionDefault expr) {
         System.out.println(ValueExpressionDefault.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeDefaultValue(T owner, ValueExpressionDefaultValue expr) {
+    private <T extends Query> void analyzeDefaultValue(T owner, ValueExpressionDefaultValue expr) {
         System.out.println(ValueExpressionDefaultValue.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeFunction(T owner, ValueExpressionFunction expr) {
+    private <T extends Query> void analyzeFunction(T owner, ValueExpressionFunction expr) {
         System.out.println(ValueExpressionFunction.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeLabeledDuration(T owner, ValueExpressionLabeledDuration expr) {
+    private <T extends Query> void analyzeLabeledDuration(T owner, ValueExpressionLabeledDuration expr) {
         System.out.println(ValueExpressionLabeledDuration.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeNested(T owner, ValueExpressionNested expr) {
+    private <T extends Query> void analyzeNested(T owner, ValueExpressionNested expr) {
         System.out.println(ValueExpressionNested.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
+        analyze(owner, expr.getNest());
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeNullValue(T owner, ValueExpressionNullValue expr) {
+    private <T extends Query> void analyzeNullValue(T owner, ValueExpressionNullValue expr) {
         System.out.println(ValueExpressionNullValue.class + ":" + expr);
-
-        ValueExpr<T> valueExpr = new ValueExpr<T>(owner);
-        valueExpr.setValueType(ValueType.NULL);
-
-        return valueExpr;
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeRow(T owner, ValueExpressionRow expr) {
+    private <T extends Query> void analyzeRow(T owner, ValueExpressionRow expr) {
         System.out.println(ValueExpressionRow.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeScalarSelect(T owner, ValueExpressionScalarSelect expr) {
+    private <T extends Query> void analyzeScalarSelect(T owner, ValueExpressionScalarSelect expr) {
         System.out.println(ValueExpressionScalarSelect.class + ":" + expr);
-        throw new RuntimeException("サポートしてません。");
+        Query subQuery = new Query(owner);
+        QueryAnalyzer analyzer = SqlAnalyzerManager.getInstance().getQueryAnalyzer();
+        analyzer.analyze(subQuery, expr.getQueryExpr());
+        owner.getSubQueryList().add(subQuery);
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeSimple(T owner, ValueExpressionSimple expr) {
+    private <T extends Query> void analyzeSimple(T owner, ValueExpressionSimple expr) {
         System.out.println(ValueExpressionSimple.class + ":" + expr);
-
-        ValueExpr<T> valueExpr = new ValueExpr<T>(owner);
-        valueExpr.setValueType(ValueType.LITERAL_VALUE);
-        valueExpr.setLiteralValue(expr.getValue());
-
-        return valueExpr;
     }
 
-    private <T extends AbstractModel<?>> ValueExpr<T> analyzeVariable(T owner, ValueExpressionVariable expr) {
+    private <T extends Query> void analyzeVariable(T owner, ValueExpressionVariable expr) {
         System.out.println(ValueExpressionVariable.class + ":" + expr);
         throw new RuntimeException("サポートしてません。");
     }

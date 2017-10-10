@@ -27,8 +27,6 @@ public class SqlAnalyzerManager {
 
     private QueryAnalyzer queryAnalyzer;
 
-    private QueryExpressionAnalyzer queryExpressionAnalyzer;
-
     private TableReferenceAnalyzer tableExpressionAnalyzer;
 
     private ValueExpressionAnalyzer valueExpressionAnalyzer;
@@ -51,14 +49,6 @@ public class SqlAnalyzerManager {
 
     public void setQueryAnalyzer(QueryAnalyzer queryAnalyzer) {
         this.queryAnalyzer = queryAnalyzer;
-    }
-
-    public QueryExpressionAnalyzer getQueryExpressionAnalyzer() {
-        return queryExpressionAnalyzer;
-    }
-
-    public void setQueryExpressionAnalyzer(QueryExpressionAnalyzer queryExpressionAnalyzer) {
-        this.queryExpressionAnalyzer = queryExpressionAnalyzer;
     }
 
     public TableReferenceAnalyzer getTableExpressionAnalyzer() {
@@ -98,7 +88,6 @@ public class SqlAnalyzerManager {
     private SqlAnalyzerManager() {
         this.queryStatementAnalyzer = new QueryStatementAnalyzer();
         this.queryAnalyzer = new QueryAnalyzer();
-        this.queryExpressionAnalyzer = new QueryExpressionAnalyzer();
         this.tableExpressionAnalyzer = new TableReferenceAnalyzer();
         this.valueExpressionAnalyzer = new ValueExpressionAnalyzer();
         this.searchConditionAnalyzer = new SearchConditionAnalyzer();

@@ -4,6 +4,7 @@
 
 package org.fantasism.eclipse.plugin.sqlanalyzer.core;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,10 +49,11 @@ public class SqlAnalyzer {
     public void analyze() {
         SQLQueryParserManager manager = SQLQueryParserManagerProvider.getInstance().getParserManager(null, null);
         try {
-            StringBuilder sb = new StringBuilder();
-            sb
+            StringBuilder selectInsert = new StringBuilder();
+            selectInsert
+            .append("INSERT INTO TABLE11 (GROUP, NAME1, NAME2) ")
             .append("WITH TEST as (    SELECT a.* FROM T_TEST)")
-            .append("    SELECT a.* ")
+            .append("    SELECT a.GROUP ")
             .append("         , b.NAME as NAME1 ")
             .append("         , 'aa' as NAME2 ")
             .append("      FROM TABLE1 a ")
@@ -68,20 +70,76 @@ public class SqlAnalyzer {
             .append("                    a.name in (select aa.name from TABLE3 aa where aa.NAME = a.NAME)")
             .append("               )")
             .append("           )")
+            .append("UNION ALL ")
+            .append("    SELECT a.GROUP ")
+            .append("         , b.NAME as NAME1 ")
+            .append("         , 'aa' as NAME2 ")
+            .append("      FROM TABLE4 a ")
+            .append("INNER JOIN TABLE5 b ")
+            .append("        ON a.ID = b.ID ")
+            .append("INNER JOIN TEST c ")
+            .append("        ON a.ID = c.ID ")
+            .append("     WHERE a.GROUP    = 'bbb' ")
+            .append("       AND a.CATEGORY = 'ccc' ")
+            .append("       AND (   a.TYPE in ('01', '02') ")
+            .append("            OR ")
+            .append("               (    b.TYPE in ('02', '03') ")
+            .append("                AND ")
+            .append("                    a.name in (select aa.name from TABLE6 aa where aa.NAME = a.NAME)")
+            .append("               )")
+            .append("           )")
+            .append("UNION ALL ")
+            .append("    SELECT a.GROUP ")
+            .append("         , b.NAME as NAME1 ")
+            .append("         , 'aa' as NAME2 ")
+            .append("      FROM TABLE7 a ")
+            .append("INNER JOIN TABLE8 b ")
+            .append("        ON a.ID = b.ID ")
+            .append("INNER JOIN TEST c ")
+            .append("        ON a.ID = c.ID ")
+            .append("     WHERE a.GROUP    = 'bbb' ")
+            .append("       AND a.CATEGORY = 'ccc' ")
+            .append("       AND (   a.TYPE in ('01', '02') ")
+            .append("            OR ")
+            .append("               (    b.TYPE in ('02', '03') ")
+            .append("                AND ")
+            .append("                    a.name in (select aa.name from TABLE9 aa where aa.NAME = a.NAME)")
+            .append("               )")
+            .append("           )")
+            .append("       AND EXISTS(")
+            .append("           SELECT * ")
+            .append("             FROM TABLE10 aa ")
+            .append("            WHERE aa.GROUP = a.GROUP ")
+            .append("           )")
             .append(";");
 
-            SQLQueryParseResult result = manager.parseQuery(sb.toString());
+            StringBuilder delete = new StringBuilder()
+            .append("DELETE FROM T_TEST1 ")
+            .append("WHERE ID = (select ID from T_TEST2 where ID = 1) ");
 
-            Query<?> query = SqlAnalyzerManager.getInstance().getQueryStatementAnalyzer().analyze(null, result.getQueryStatement());
+            StringBuilder update = new StringBuilder()
+            .append("UPDATE T_TEST1 ")
+            .append("   SET NAME = 'aaaa' ")
+            .append("     , REMARKS = (select remarks from T_TEST2 where T_TEST2.ID = T_TEST1.ID) ")
+            .append("WHERE ID = (select ID from T_TEST3 where ID = 1) ");
 
-            query.getAlias();
+            SQLQueryParseResult result = manager.parseQuery(update.toString());
+
+            Query query = new Query(null);
+            SqlAnalyzerManager.getInstance().getQueryStatementAnalyzer().analyze(query, result.getQueryStatement());
+
+
+            SqlAnalyzerWriter writer = new SqlAnalyzerWriter("C:\\Users\\TAKAHIDE\\Documents");
+            writer.write(query);
+            query = query;
+
 
         } catch (SQLParserException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
+            throw new RuntimeException(e);
         } catch (SQLParserInternalException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

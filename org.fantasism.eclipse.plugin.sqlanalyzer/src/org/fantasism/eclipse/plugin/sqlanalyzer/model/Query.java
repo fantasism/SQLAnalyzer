@@ -5,9 +5,7 @@
 package org.fantasism.eclipse.plugin.sqlanalyzer.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * TODO クラスの概要
@@ -16,7 +14,7 @@ import java.util.Map;
  * </p>
  * @author Takahide Ohsuka, FANTASISM.
  */
-public class Query<T extends AbstractModel<?>> extends AbstractModel<T> {
+public class Query {
 
     public enum QueryType {
         SIMPLE_TABLE,
@@ -28,59 +26,35 @@ public class Query<T extends AbstractModel<?>> extends AbstractModel<T> {
     }
 
     /** サブクエリリスト */
-    private List<Query<?>> subQueryList;
+    private List<Query> subQueryList;
 
     /** クエリ種別 */
     private QueryType queryType;
 
-    /** テーブル名 */
-    private String tableName;
+    private List<String> joinTableNames;
 
-    /** 別名 */
-    private String alias;
+    private Query unionQuery;
 
-    /** ＳＥＬＥＣＴ句リスト */
-    private List<SelectClause<Query<T>>> selectClausesList;
+    private Query nestedQuery;
 
-    /** ＦＲＯＭ句リスト */
-    private List<FromClause<Query<T>>> fromClauseList;
+    /** 親クエリ */
+    private Query ownerQuery;
 
-    private WhereClause<Query<T>> whereClause;
-
-    /** ＧＲＯＵＰ　ＢＹ句リスト */
-    private List<GroupByClause<Query<T>>> groupByClauseList;
-
-    /** ＨＡＶＩＮＧ句リスト */
-    private HavingClause<Query<T>> havingClause;
-
-    /** ＯＲＤＥＲ　ＢＹ句リスト */
-    private List<OrderByClause<Query<T>>> orderByClauseList;
-
-    /** ＳＥＴ句リスト */
-    private List<SetClause<Query<T>>> setClauseList;
-
-    /** ＩＮＴＯ句クエリ */
-    private Query<Query<T>> intoQuery;
-
-    /** 関連クエリ */
-    private Map<String, Query<Query<?>>> relationQueryMap;
-
-    public Query(T owner) {
-        super(owner);
-        this.subQueryList = new ArrayList<Query<?>>();
-        this.selectClausesList = new ArrayList<SelectClause<Query<T>>>();
-        this.fromClauseList = new ArrayList<FromClause<Query<T>>>();
-        this.groupByClauseList = new ArrayList<GroupByClause<Query<T>>>();
-        this.orderByClauseList = new ArrayList<OrderByClause<Query<T>>>();
-        this.setClauseList = new ArrayList<SetClause<Query<T>>>();
-        this.relationQueryMap = new HashMap<String, Query<Query<?>>>();
+    public Query(Query owner) {
+        if (owner != null) {
+            this.ownerQuery = owner.getOwnerQuery();
+        } else {
+            this.ownerQuery = this;
+        }
+        this.subQueryList = new ArrayList<Query>();
+        this.joinTableNames = new ArrayList<>();
     }
 
     /**
      * サブクエリリストを取得します。
      * @return サブクエリリスト
      */
-    public List<Query<?>> getSubQueryList() {
+    public List<Query> getSubQueryList() {
         return subQueryList;
     }
 
@@ -88,7 +62,7 @@ public class Query<T extends AbstractModel<?>> extends AbstractModel<T> {
      * サブクエリリストを設定します。
      * @param subQueryList サブクエリリスト
      */
-    public void setSubQueryList(List<Query<?>> subQueryList) {
+    public void setSubQueryList(List<Query> subQueryList) {
         this.subQueryList = subQueryList;
     }
 
@@ -109,179 +83,67 @@ public class Query<T extends AbstractModel<?>> extends AbstractModel<T> {
     }
 
     /**
-     * テーブル名を取得します。
-     * @return テーブル名
+     * joinTableNamesを取得します。
+     * @return joinTableNames
      */
-    public String getTableName() {
-        return tableName;
+    public List<String> getJoinTableNames() {
+        return joinTableNames;
     }
 
     /**
-     * テーブル名を設定します。
-     * @param tableName テーブル名
+     * joinTableNamesを設定します。
+     * @param joinTableNames joinTableNames
      */
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public void setJoinTableNames(List<String> joinTableNames) {
+        this.joinTableNames = joinTableNames;
     }
 
     /**
-     * 別名を取得します。
-     * @return 別名
+     * unionQueryを取得します。
+     * @return unionQuery
      */
-    public String getAlias() {
-        return alias;
+    public Query getUnionQuery() {
+        return unionQuery;
     }
 
     /**
-     * 別名を設定します。
-     * @param alias 別名
+     * unionQueryを設定します。
+     * @param unionQuery unionQuery
      */
-    public void setAlias(String alias) {
-        this.alias = alias;
+    public void setUnionQuery(Query unionQuery) {
+        this.unionQuery = unionQuery;
     }
 
     /**
-     * ＳＥＬＥＣＴ句リストを取得します。
-     * @return ＳＥＬＥＣＴ句リスト
+     * nestedQueryを取得します。
+     * @return nestedQuery
      */
-    public List<SelectClause<Query<T>>> getSelectClausesList() {
-        return selectClausesList;
+    public Query getNestedQuery() {
+        return nestedQuery;
     }
 
     /**
-     * ＳＥＬＥＣＴ句リストを設定します。
-     * @param selectClausesList ＳＥＬＥＣＴ句リスト
+     * nestedQueryを設定します。
+     * @param nestedQuery nestedQuery
      */
-    public void setSelectClausesList(List<SelectClause<Query<T>>> selectClausesList) {
-        this.selectClausesList = selectClausesList;
+    public void setNestedQuery(Query nestedQuery) {
+        this.nestedQuery = nestedQuery;
     }
 
     /**
-     * ＦＲＯＭ句リストを取得します。
-     * @return ＦＲＯＭ句リスト
+     * 親クエリを取得します。
+     * @return 親クエリ
      */
-    public List<FromClause<Query<T>>> getFromClauseList() {
-        return fromClauseList;
+    public Query getOwnerQuery() {
+        return ownerQuery;
     }
 
     /**
-     * ＦＲＯＭ句リストを設定します。
-     * @param fromClauseList ＦＲＯＭ句リスト
+     * 親クエリを設定します。
+     * @param ownerQuery 親クエリ
      */
-    public void setFromClauseList(List<FromClause<Query<T>>> fromClauseList) {
-        this.fromClauseList = fromClauseList;
-    }
-
-    /**
-     * whereClauseを取得します。
-     * @return whereClause
-     */
-    public WhereClause<Query<T>> getWhereClause() {
-        return whereClause;
-    }
-
-    /**
-     * whereClauseを設定します。
-     * @param whereClause whereClause
-     */
-    public void setWhereClause(WhereClause<Query<T>> whereClause) {
-        this.whereClause = whereClause;
-    }
-
-    /**
-     * ＧＲＯＵＰ　ＢＹ句リストを取得します。
-     * @return ＧＲＯＵＰ　ＢＹ句リスト
-     */
-    public List<GroupByClause<Query<T>>> getGroupByClauseList() {
-        return groupByClauseList;
-    }
-
-    /**
-     * ＧＲＯＵＰ　ＢＹ句リストを設定します。
-     * @param groupByClauseList ＧＲＯＵＰ　ＢＹ句リスト
-     */
-    public void setGroupByClauseList(List<GroupByClause<Query<T>>> groupByClauseList) {
-        this.groupByClauseList = groupByClauseList;
-    }
-
-    /**
-     * ＨＡＶＩＮＧ句リストを取得します。
-     * @return ＨＡＶＩＮＧ句リスト
-     */
-    public HavingClause<Query<T>> getHavingClause() {
-        return havingClause;
-    }
-
-    /**
-     * ＨＡＶＩＮＧ句リストを設定します。
-     * @param havingClause ＨＡＶＩＮＧ句リスト
-     */
-    public void setHavingClause(HavingClause<Query<T>> havingClause) {
-        this.havingClause = havingClause;
-    }
-
-    /**
-     * ＯＲＤＥＲ　ＢＹ句リストを取得します。
-     * @return ＯＲＤＥＲ　ＢＹ句リスト
-     */
-    public List<OrderByClause<Query<T>>> getOrderByClauseList() {
-        return orderByClauseList;
-    }
-
-    /**
-     * ＯＲＤＥＲ　ＢＹ句リストを設定します。
-     * @param orderByClauseList ＯＲＤＥＲ　ＢＹ句リスト
-     */
-    public void setOrderByClauseList(List<OrderByClause<Query<T>>> orderByClauseList) {
-        this.orderByClauseList = orderByClauseList;
-    }
-
-    /**
-     * ＳＥＴ句リストを取得します。
-     * @return ＳＥＴ句リスト
-     */
-    public List<SetClause<Query<T>>> getSetClauseList() {
-        return setClauseList;
-    }
-
-    /**
-     * ＳＥＴ句リストを設定します。
-     * @param setClauseList ＳＥＴ句リスト
-     */
-    public void setSetClauseList(List<SetClause<Query<T>>> setClauseList) {
-        this.setClauseList = setClauseList;
-    }
-
-    /**
-     * ＩＮＴＯ句クエリを取得します。
-     * @return ＩＮＴＯ句クエリ
-     */
-    public Query<Query<T>> getIntoQuery() {
-        return intoQuery;
-    }
-
-    /**
-     * ＩＮＴＯ句クエリを設定します。
-     * @param intoQuery ＩＮＴＯ句クエリ
-     */
-    public void setIntoQuery(Query<Query<T>> intoQuery) {
-        this.intoQuery = intoQuery;
-    }
-
-    /**
-     * 関連クエリを取得します。
-     * @return 関連クエリ
-     */
-    public Map<String,Query<Query<?>>> getRelationQueryMap() {
-        return relationQueryMap;
-    }
-
-    /**
-     * 関連クエリを設定します。
-     * @param relationQueryMap 関連クエリ
-     */
-    public void setRelationQueryMap(Map<String,Query<Query<?>>> relationQueryMap) {
-        this.relationQueryMap = relationQueryMap;
+    public void setOwnerQuery(Query ownerQuery) {
+        this.ownerQuery = ownerQuery;
     }
 
 }
