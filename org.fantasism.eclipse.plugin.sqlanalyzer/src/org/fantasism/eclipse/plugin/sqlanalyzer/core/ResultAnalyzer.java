@@ -4,9 +4,12 @@
 
 package org.fantasism.eclipse.plugin.sqlanalyzer.core;
 
+import org.eclipse.datatools.modelbase.sql.query.OrderByResultColumn;
 import org.eclipse.datatools.modelbase.sql.query.QueryResultSpecification;
 import org.eclipse.datatools.modelbase.sql.query.ResultColumn;
 import org.eclipse.datatools.modelbase.sql.query.ResultTableAllColumns;
+import org.eclipse.emf.common.util.EList;
+import org.fantasism.eclipse.plugin.sqlanalyzer.SqlAnalyzerContext;
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
 
 /**
@@ -16,9 +19,17 @@ import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
  * </p>
  * @author Takahide Ohsuka, FANTASISM.
  */
-public class ResultSpecificationAnalyzer {
+public class ResultAnalyzer {
+
+    private SqlAnalyzerContext context;
+
+    public ResultAnalyzer(SqlAnalyzerContext context) {
+        this.context = context;
+    }
 
     public <T extends Query> void analyze(T owner, QueryResultSpecification result) {
+
+        System.out.println("[BEGIN] " + result.getClass().getSimpleName() + " : " + result);
 
         if (result instanceof ResultColumn) {
             analyzeColumn(owner, (ResultColumn) result);
@@ -27,19 +38,33 @@ public class ResultSpecificationAnalyzer {
             analyzeTableAllColumn(owner, (ResultTableAllColumns) result);
 
         } else {
-            System.out.println(result);
             throw new RuntimeException("サポートしてません。");
         }
+
+        System.out.println("[END  ] " + result.getClass().getSimpleName() + " : " + result);
+
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends Query> void analyzeColumn(T owner, ResultColumn result) {
-        System.out.println(ResultColumn.class + ":" + result);
-        ValueExpressionAnalyzer analyzer = SqlAnalyzerManager.getInstance().getValueExpressionAnalyzer();
+
+        ValueAnalyzer analyzer = context.getValueAnalyzer();
+
         analyzer.analyze(owner, result.getValueExpr());
+
+        for (OrderByResultColumn column : (EList<OrderByResultColumn>) result.getOrderByResultCol()) {
+            // TODO
+            throw new RuntimeException("サポートしてません。");
+        }
+
     }
 
     private <T extends Query> void analyzeTableAllColumn(T owner, ResultTableAllColumns result) {
-        System.out.println(ResultTableAllColumns.class + ":" + result);
+
+        TableAnalyzer tableAnalyzer = context.getTableAnalyzer();
+
+        tableAnalyzer.analyze(owner, result.getTableExpr());
+
     }
 
 }

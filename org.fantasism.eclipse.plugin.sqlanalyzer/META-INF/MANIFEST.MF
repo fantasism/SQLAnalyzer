@@ -9,6 +9,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.datatools.sqltools.parsers.sql;bundle-version="1.0.2",
  org.eclipse.datatools.sqltools.parsers.sql.lexer;bundle-version="1.0.1",
- org.eclipse.datatools.sqltools.parsers.sql.query;bundle-version="1.2.1"
+ org.eclipse.datatools.sqltools.parsers.sql.query;bundle-version="1.2.1",
+ org.eclipse.core.resources;bundle-version="3.7.101",
+ org.eclipse.datatools.sqltools.sqlbuilder;bundle-version="1.0.3",
+ org.apache.log4j;bundle-version="1.2.15"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

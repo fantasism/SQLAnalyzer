@@ -17,7 +17,7 @@
  * the License.
  */
 
-package org.fantasism.eclipse.plugin.sqlanalyzer.core;
+package org.fantasism.eclipse.plugin.sqlanalyzer;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -26,7 +26,6 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.fantasism.eclipse.plugin.sqlanalyzer.model.Query;
@@ -43,13 +42,16 @@ public class SqlAnalyzerWriter {
     private String filePath;
     private BufferedWriter writer;
     private Set<String> writedSet;
+    private String queryName;
 
     public SqlAnalyzerWriter(String basePath) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMDDhhmmss");
         this.filePath = basePath + "\\SqlAnalyzerList_" + sdf.format(new Date()) + ".tsv";
     }
 
-    public void write(Query query) throws IOException {
+    public void write(String queryName, Query query) throws IOException {
+
+        this.queryName = queryName;
 
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.filePath, true), "UTF-8"));
@@ -96,7 +98,7 @@ public class SqlAnalyzerWriter {
         }
 
         for (String tableName : query.getJoinTableNames()) {
-            String text = tableName + "\t" + crud;
+            String text = queryName + "\t" + tableName + "\t" + crud;
             if (writedSet.contains(text)) {
 
             } else {
